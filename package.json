@@ -1,0 +1,52 @@
+{
+  "name": "jsonbird",
+  "version": "1.0.0",
+  "description": "JSON-RPC 2.0 client/server/peer for any reliable transport. Inter-process communication. REST. WebSocket. WebWorker. Out of order messages or in-order byte stream",
+  "main": "lib/JSONBird.js",
+  "scripts": {
+    "pretest": "eslint lib test && jscs lib test",
+    "test": "istanbul cover node_modules/mocha/bin/_mocha test",
+    "doc": "jsdoc2md --src \"lib/*.js\" > README.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joris-van-der-Wel/jsonbird.git"
+  },
+  "keywords": [
+    "json",
+    "rpc",
+    "streaming",
+    "stream",
+    "worker",
+    "webworker",
+    "real-time",
+    "WebSocket",
+    "WebSockets",
+    "rest",
+    "web",
+    "api"
+  ],
+  "author": "Joris van der Wel <joris@jorisvanderwel.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Joris-van-der-Wel/jsonbird/issues"
+  },
+  "homepage": "https://github.com/Joris-van-der-Wel/jsonbird#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "grunt": "^1.0.1",
+    "grunt-cli": "^1.2.0",
+    "grunt-eslint": "^18.1.0",
+    "grunt-jscs": "^3.0.0",
+    "istanbul": "^0.4.4",
+    "jsdoc-to-markdown": "^1.3.6",
+    "mocha": "^2.5.3",
+    "mocha-sugar-free": "^1.3.1",
+    "through2": "^2.0.1"
+  },
+  "dependencies": {
+    "jsonparse": "^1.2.0",
+    "readable-stream": "^2.1.4",
+    "shortid": "^2.2.6"
+  }
+}

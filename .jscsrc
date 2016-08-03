@@ -1,0 +1,135 @@
+{
+    "disallowImplicitTypeConversion": [
+        "numeric",
+        "boolean",
+        "binary",
+        "string"
+    ],
+    "disallowMultipleLineStrings": true,
+    "disallowMultipleVarDecl": true,
+    "disallowNewlineBeforeBlockStatements": true,
+    "disallowParenthesesAroundArrowParam": true,
+    "disallowQuotedKeysInObjects": true,
+    "disallowSpaceAfterObjectKeys": {
+        "allExcept": [
+            "aligned",
+            "method"
+        ]
+    },
+    "disallowSpaceAfterPrefixUnaryOperators": true,
+    "disallowSpaceBeforePostfixUnaryOperators": true,
+    "disallowSpaceBeforeSemicolon": true,
+    "disallowSpacesInCallExpression": true,
+    "disallowSpacesInFunction": {
+        "beforeOpeningRoundBrace": true
+    },
+    "disallowSpacesInGenerator": {
+        "beforeStar": true
+    },
+    "disallowSpacesInNamedFunctionExpression": {
+        "beforeOpeningRoundBrace": true
+    },
+    "disallowSpacesInsideArrayBrackets": "all",
+    "disallowSpacesInsideBrackets": true,
+    "disallowSpacesInsideObjectBrackets": true,
+    "disallowSpacesInsideParentheses": true,
+    "disallowTabs": true,
+    "disallowTrailingWhitespace": true,
+    "disallowVar": true,
+    "disallowYodaConditions": true,
+    "jsDoc": {
+        "checkAnnotations": "jsdoc3",
+        "checkParamExistence": true,
+        "checkParamNames": true,
+        "requireParamTypes": true,
+        "checkRedundantParams": true,
+        "requireReturnTypes": true,
+        "checkTypes": "strictNativeCase",
+        "requireNewlineAfterDescription": true
+    },
+    "maximumLineLength": {
+        "value": 140
+    },
+    "requireAlignedMultilineParams": true,
+    "requireArrowFunctions": true,
+    "requireBlocksOnNewline": true,
+    "requireCamelCaseOrUpperCaseIdentifiers": true,
+    "requireCapitalizedConstructors": true,
+    "requireCapitalizedConstructorsNew": {
+        "allExcept": [
+            "Array",
+            "Boolean",
+            "Error",
+            "Number",
+            "Object",
+            "String",
+            "Symbol"
+        ]
+    },
+    "requireCommaBeforeLineBreak": true,
+    "requireCurlyBraces": true,
+    "requireDotNotation": "except_snake_case",
+    "requireEarlyReturn": true,
+    "requireImportAlphabetized": true,
+    "requireKeywordsOnNewLine": [
+        "else",
+        "catch",
+        "finally"
+    ],
+    "requireLineBreakAfterVariableAssignment": true,
+    "requireLineFeedAtFileEnd": true,
+    "requireNumericLiterals": true,
+    "requireObjectDestructuring": true,
+    "requireObjectKeysOnNewLine": {
+        "allExcept": [
+            "sameLine"
+        ]
+    },
+    "requirePaddingNewLinesAfterUseStrict": true,
+    "requirePaddingNewLinesBeforeExport": true,
+    "requirePaddingNewlinesBeforeKeywords": [
+        "do",
+        "for",
+        "if",
+        "switch",
+        "case",
+        "try",
+        "while",
+        "return",
+        "function"
+    ],
+    "requireParenthesesAroundIIFE": true,
+    "requireSemicolons": true,
+    "requireShorthandArrowFunctions": true,
+    "requireSpaceAfterBinaryOperators": true,
+    "requireSpaceAfterComma": true,
+    "requireSpaceAfterLineComment": true,
+    "requireSpaceBeforeBinaryOperators": true,
+    "requireSpaceBeforeBlockStatements": true,
+    "requireSpaceBeforeDestructuredValues": true,
+    "requireSpaceBeforeKeywords": [
+        "else",
+        "while",
+        "catch"
+    ],
+    "requireSpaceBeforeObjectValues": true,
+    "requireSpaceBetweenArguments": true,
+    "requireSpacesInConditionalExpression": true,
+    "requireSpacesInForStatement": true,
+    "requireSpacesInFunction": {
+        "beforeOpeningCurlyBrace": true
+    },
+    "requireSpacesInGenerator": {
+        "afterStar": true
+    },
+    "requireSpread": true,
+    "requireUseStrict": true,
+    "requireTrailingComma": {
+        "ignoreSingleLine": true
+    },
+    "validateIndentation": 4,
+    "validateLineBreaks": "LF",
+    "validateNewlineAfterArrayElements": true,
+    "validateParameterSeparator": ", ",
+    "validateQuoteMarks": "'"
+}
