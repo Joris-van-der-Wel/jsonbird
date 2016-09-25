@@ -364,6 +364,8 @@ describe('JSONBird handling object streams', () => {
                         code: 0,
                         message: 'A simple error',
                         data: {
+                            isJSError: true,
+                            name: 'Error',
                             fileName: '/var/example.js',
                             lineNumber: 16,
                             columnNumber: 50,
@@ -842,6 +844,184 @@ describe('JSONBird handling object streams', () => {
 
                 assert.strictEqual(rpc.clientPending, 0);
             });
+        });
+
+        it('should interpret remote error stacks if receiveErrorStack is enabled', () => {
+            readStream.pipe(rpc);
+            rpc.pipe(writeStream);
+
+            const fates = new PromiseFateTracker();
+            // obtained by executing `Error('Uh o!').stack` in the node.js REPL
+            const testStack = 'Error: Uh o!\n    at Error (native)\n    at repl:1:1\n    at sigintHandlersWrap (vm.js:22:35)\n    at' +
+                ' sigintHandlersWrap (vm.js:96:12)\n    at ContextifyScript.Script.runInThisContext (vm.js:21:12)\n    at' +
+                ' REPLServer.defaultEval (repl.js:313:29)\n    at bound (domain.js:280:14)\n    at REPLServer.runBound [as eval]' +
+                ' (domain.js:293:12)\n    at REPLServer.<anonymous> (repl.js:503:10)\n    at emitOne (events.js:101:20)';
+
+            assert.isFalse(rpc.receiveErrorStack, 'Should be off by default'); // (e.g. our peer can not be trusted)
+            rpc.receiveErrorStack = true;
+            fates.track(0, rpc.call('reject me'));
+            fates.track(1, rpc.call('reject me'));
+            fates.track(2, rpc.call('reject me'));
+            fates.track(3, rpc.call('reject me'));
+
+            return writeWait.wait(4)
+            .then(() => {
+                fates.assertPending(0);
+                fates.assertPending(1);
+                fates.assertPending(2);
+                fates.assertPending(3);
+            })
+            .then(() => Promise.all([
+                streamWrite(readStream, {
+                    jsonrpc: '2.0',
+                    error: {
+                        code: 123,
+                        message: 'foo',
+                        data: {
+                            isJSError: true,
+                            name: 'FooError',
+                            stack: testStack,
+                            fileName: 'foo.js',
+                            lineNumber: 123,
+                            columnNumber: 10,
+                        },
+                    },
+                    id: 0,
+                }),
+                streamWrite(readStream, {
+                    jsonrpc: '2.0',
+                    error: {
+                        code: 123,
+                        message: 'foo',
+                        data: {
+                            isJSError: true,
+                        },
+                    },
+                    id: 1,
+                }),
+                streamWrite(readStream, {
+                    jsonrpc: '2.0',
+                    error: {
+                        code: 123,
+                        message: 'foo',
+                        data: {
+                            isJSError: false,
+                            name: 'FooError',
+                            stack: testStack,
+                            fileName: 'foo.js',
+                            lineNumber: 123,
+                            columnNumber: 10,
+                        },
+                    },
+                    id: 2,
+                }),
+                streamWrite(readStream, {
+                    jsonrpc: '2.0',
+                    error: {
+                        code: 123,
+                        message: 'foo',
+                    },
+                    id: 3,
+                }),
+            ]))
+            .then(() => fates.waitForAllSettled())
+            .then(() => {
+                fates.assertRejected(0);
+                fates.assertRejected(1);
+                fates.assertRejected(2);
+                fates.assertRejected(3);
+
+                const error0 = fates.getFate(0).reject;
+                const error1 = fates.getFate(1).reject;
+                const error2 = fates.getFate(2).reject;
+                const error3 = fates.getFate(3).reject;
+
+                assert.strictEqual(error0.name, 'RPCRequestError<FooError>');
+                assert.strictEqual(error0.message, 'foo');
+                assert.strictEqual(error0.fileName, 'foo.js');
+                assert.strictEqual(error0.lineNumber, 123);
+                assert.strictEqual(error0.columnNumber, 10);
+                assert.isString(error0.localStack);
+                assert.isAtLeast(error0.localStack.length, 50);
+                assert.strictEqual(error0.remoteStack, testStack);
+                assert.strictEqual(error0.stack, error0.localStack + '\n' + 'Caused by Remote ' + testStack);
+
+                assert.strictEqual(error1.name, 'RPCRequestError<undefined>');
+                assert.strictEqual(error1.message, 'foo');
+                assert.strictEqual(error1.fileName, 'undefined');
+                assert(Number.isNaN(error1.lineNumber));
+                assert(Number.isNaN(error1.columnNumber));
+                assert.isString(error1.localStack);
+                assert.isAtLeast(error1.localStack.length, 50);
+                assert.strictEqual(error1.remoteStack, 'undefined');
+                assert.strictEqual(error1.stack, error1.localStack + '\n' + 'Caused by Remote undefined');
+
+                assert.strictEqual(error2.name, 'RPCRequestError');
+                assert.strictEqual(error2.message, 'foo');
+                assert.notEqual(error2.fileName, 'foo.js');
+                assert.notEqual(error2.lineNumber, 123);
+                assert.notEqual(error2.columnNumber, 10);
+                assert.isUndefined(error2.localStack);
+                assert.isUndefined(error2.remoteStack);
+                assert.notMatch(error2.stack, /cause|remote/i);
+
+                assert.strictEqual(error3.name, 'RPCRequestError');
+                assert.strictEqual(error3.message, 'foo');
+                assert.notEqual(error3.fileName, 'foo.js');
+                assert.notEqual(error3.lineNumber, 123);
+                assert.notEqual(error3.columnNumber, 10);
+                assert.isUndefined(error3.localStack);
+                assert.isUndefined(error3.remoteStack);
+                assert.notMatch(error3.stack, /cause|remote/i);
+                error3.parseDataAsRemoteStack();
+                assert.strictEqual(error3.name, 'RPCRequestError<undefined>');
+                assert.strictEqual(error3.message, 'foo');
+                assert.strictEqual(error3.fileName, 'undefined');
+                assert(Number.isNaN(error3.lineNumber));
+                assert(Number.isNaN(error3.columnNumber));
+                assert.isString(error3.localStack);
+                assert.isAtLeast(error3.localStack.length, 50);
+                assert.strictEqual(error3.remoteStack, 'undefined');
+                assert.strictEqual(error3.stack, error3.localStack + '\n' + 'Caused by Remote undefined');
+
+
+                rpc.receiveErrorStack = false;
+                fates.track(4, rpc.call('reject me'));
+
+                return writeWait.wait(1);
+            })
+            .then(() => fates.assertPending(4))
+            .then(() => streamWrite(readStream, {
+                jsonrpc: '2.0',
+                error: {
+                    code: 123,
+                    message: 'foo',
+                    data: {
+                        isJSError: true,
+                        name: 'FooError',
+                        stack: testStack,
+                        fileName: 'foo.js',
+                        lineNumber: 123,
+                        columnNumber: 10,
+                    },
+                },
+                id: 4,
+            }))
+            .then(() => fates.waitForAllSettled())
+            .then(() => {
+                fates.assertRejected(4);
+                const error4 = fates.getFate(4).reject;
+
+                assert.strictEqual(error4.name, 'RPCRequestError');
+                assert.strictEqual(error4.message, 'foo');
+                assert.notEqual(error4.fileName, 'foo.js');
+                assert.notEqual(error4.lineNumber, 123);
+                assert.notEqual(error4.columnNumber, 10);
+                assert.isUndefined(error4.localStack);
+                assert.isUndefined(error4.remoteStack);
+                assert.notMatch(error4.stack, /cause|remote/i);
+            })
+            ;
         });
 
         it('should report invalid response objects', () => {
