@@ -1,10 +1,7 @@
-<a name="JSONBird"></a>
+# JSONBird
+JSONBird is a Duplex stream which makes it easy to create a flexible JSON-RPC 2.0 client or server (or a bidirectional combination) over any reliable transport. You can use out of order messaging or an in-order byte stream.
 
-## JSONBird
-JSONBird is a Duplex stream which makes it easy to create a flexible JSON-RPC 2.0 client or server (or a bidirectional combination)
-over any reliable transport. You can use out of order messages or in-order byte stream.",
-
-It can parse/emit JSON strings or plain old javascript objects.
+It can parse/emit JSON strings or parse/emit plain-old-javascript-objects in memory.
 
 JSONBird does not care what transport is used, for example you could use:
 * Synchronous HTTP request/responses
@@ -13,8 +10,118 @@ JSONBird does not care what transport is used, for example you could use:
 * TCP
 * SCTP
 * postMessage() between a Web Worker or iframe's in a browser (without having to serialize to JSON)
-* direct in-memory communication between two instances (for example, for test stubs)
-* message port's for multiprocess browser extensions
+* Direct in-memory communication between two instances (for example, for test stubs)
+* Message port's for multiprocess browser extensions
+
+# Examples
+
+## Registering methods
+
+```javascript
+const Promise = require('bluebird');
+const JSONBird = require('jsonbird');
+const rpc = new JSONBird({/*options*/});
+
+class MyMethods {
+  add(a, b) {
+    return a + b;
+  }
+
+  subtract(a, b) {
+    return this.add(a, -b);
+  }
+
+  slowAdd(a, b) {
+    return Promise.delay(100).then(() => this.add(a, b));
+  }
+}
+
+rpc.methods(new MyMethods());
+rpc.method('multiply', (a, b) => a * b);
+```
+
+## WebSocket Server (node.js)
+
+```javascript
+const JSONBird = require('jsonbird');
+const express = require('express');
+const {createServer: createWebSocketServer} = require('websocket-stream');
+
+const app = express();
+app.get('/', (request, response) => response.end('Hi!'));
+
+const server = app.listen(1234);
+const webSocketServer = createWebSocketServer({server}, wsStream => {
+  // `rpc` is a node.js duplex stream. The "readable" side refers to the
+  // output of JSONBird (you "read" the output from the stream). The
+  // "writable" side refers to the input of JSONBird (you "write" the
+  // input to the stream):
+
+  const rpc = new JSONBird({
+    // The "json-message" readable mode emits JSON documents in object
+    // mode, this ensures that our peer never receives a split up json
+    // document from us (WebSocket is message based, as opposed to
+    // stream based)
+    readableMode: 'json-message',
+
+    // The "json-stream" writable mode accepts JSON documents as a
+    // string and will reconstruct a split up json document.
+    writableMode: 'json-stream',
+
+    // Combining these two modes in this example will maximize
+    // compatibility with other JSON-RPC implementations.
+  });
+
+  rpc.methods(new MyMethods());
+
+  wsStream.pipe(rpc);
+  rpc.pipe(wsStream);
+});
+```
+
+## WebSocket client (browser)
+
+```javascript
+const JSONBird = require('jsonbird'); // e.g. browserify
+const {WebSocket} = window;
+
+const rpc = new JSONBird({
+  readableMode: 'json-message',
+  writableMode: 'json-stream',
+});
+
+const connect = () => {
+    const ws = new WebSocket('ws://localhost:1234/');
+    ws.binaryType = 'arraybuffer';
+
+    const rpcOnData = str => ws.send(str);
+
+    ws.onopen = () => {
+      rpc.on('data', rpcOnData);
+
+      rpc.call('add', 10, 3)
+        .then(result => rpc.call('subtract', result, 1))
+        .then(result => console.log('result:', result)) // 12
+        ;
+    };
+    ws.onclose = () => {
+      rpc.removeListener('data', rpcOnData);
+    };
+    ws.onmessage = e => {
+      const data = Buffer.from(e.data);
+      rpc.write(data);
+    };
+};
+
+connect();
+```
+
+# API Documentation
+<a name="JSONBird"></a>
+
+## JSONBird
+JSONBird is a Duplex stream which makes it easy to create a flexible JSON-RPC 2.0 client or server (or a bidirectional combination)
+over any reliable transport. You can use out of order messaging or an in-order byte stream.
 
 **Kind**: global class  
 
@@ -31,6 +138,8 @@ JSONBird does not care what transport is used, for example you could use:
         * [.finishOnEnd](#JSONBird+finishOnEnd)
         * [.serverPending](#JSONBird+serverPending) ⇒ <code>number</code>
         * [.clientPending](#JSONBird+clientPending) ⇒ <code>number</code>
+        * [.receiveErrorStack](#JSONBird+receiveErrorStack) ⇒ <code>boolean</code>
+        * [.receiveErrorStack](#JSONBird+receiveErrorStack)
         * [.sendErrorStack](#JSONBird+sendErrorStack) ⇒ <code>boolean</code>
         * [.sendErrorStack](#JSONBird+sendErrorStack)
         * [.defaultTimeout](#JSONBird+defaultTimeout) ⇒ <code>number</code>
@@ -61,6 +170,7 @@ JSONBird does not care what transport is used, for example you could use:
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | [optionsArg] | <code>Object</code> |  | The effect of these options are documented at the getter/setter with the same name |
+| [optionsArg.receiveErrorStack] | <code>boolean</code> | <code>false</code> |  |
 | [optionsArg.sendErrorStack] | <code>boolean</code> | <code>false</code> |  |
 | [optionsArg.writableMode] | <code>string</code> | <code>&quot;json-stream&quot;</code> |  |
 | [optionsArg.readableMode] | <code>string</code> | <code>&quot;json-stream&quot;</code> |  |
@@ -202,6 +312,27 @@ The number of incoming RPC requests for which we have not sent a reply yet
 The number of outstanding RPC requests for which we have not yet received a response.
 
 **Kind**: instance property of <code>[JSONBird](#JSONBird)</code>  
+<a name="JSONBird+receiveErrorStack"></a>
+
+### jsonBird.receiveErrorStack ⇒ <code>boolean</code>
+If true and a remote method throws, attempt to read stack trace information from the JSON-RPC `error.data` property. This stack
+trace information is then used to set the `fileName`, `lineNumber`, `columnNumber` and `stack` properties of our local `Error`
+object (the Error object that the `.call()` function will reject with).
+
+**Kind**: instance property of <code>[JSONBird](#JSONBird)</code>  
+<a name="JSONBird+receiveErrorStack"></a>
+
+### jsonBird.receiveErrorStack
+If true and a remote method throws, attempt to read stack trace information from the JSON-RPC `error.data` property. This stack
+trace information is then used to set the `fileName`, `lineNumber`, `columnNumber` and `stack` properties of our local `Error`
+object (the Error object that the `.call()` function will reject with).
+
+**Kind**: instance property of <code>[JSONBird](#JSONBird)</code>  
+
+| Param | Type |
+| --- | --- |
+| value | <code>boolean</code> | 
+
 <a name="JSONBird+sendErrorStack"></a>
 
 ### jsonBird.sendErrorStack ⇒ <code>boolean</code>
