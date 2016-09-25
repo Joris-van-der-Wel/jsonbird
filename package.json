@@ -1,12 +1,13 @@
 {
   "name": "jsonbird",
   "version": "1.0.0",
-  "description": "JSON-RPC 2.0 client/server/peer for any reliable transport. Inter-process communication. REST. WebSocket. WebWorker. Out of order messages or in-order byte stream",
+  "description": "JSON-RPC 2.0 client/server/peer for any reliable transport. Inter-process communication. REST. WebSocket. WebWorker. Out of order messaging or in-order byte streams",
   "main": "lib/JSONBird.js",
   "scripts": {
     "pretest": "eslint lib test && jscs lib test",
     "test": "istanbul cover node_modules/mocha/bin/_mocha test",
-    "doc": "jsdoc2md --src \"lib/*.js\" > README.md"
+    "predoc": "cat readme-header.md > README.md",
+    "doc": "jsdoc2md --src \"lib/*.js\" >> README.md"
   },
   "repository": {
     "type": "git",
