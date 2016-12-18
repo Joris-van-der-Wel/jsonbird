@@ -1,4 +1,6 @@
 # JSONBird
+[![Travis CI Build Status](https://api.travis-ci.org/Joris-van-der-Wel/jsonbird.svg?branch=master)](https://travis-ci.org/Joris-van-der-Wel/jsonbird) [![Coverage Status](https://coveralls.io/repos/github/Joris-van-der-Wel/jsonbird/badge.svg?branch=master)](https://coveralls.io/github/Joris-van-der-Wel/jsonbird?branch=master)
+
 JSONBird is a Duplex stream which makes it easy to create a flexible JSON-RPC 2.0 client or server (or a bidirectional combination) over any reliable transport. You can use out of order messaging or an in-order byte stream.
 
 It can parse/emit JSON strings or parse/emit plain-old-javascript-objects in memory.

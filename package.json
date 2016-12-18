@@ -6,6 +6,8 @@
   "scripts": {
     "pretest": "eslint lib test && jscs lib test",
     "test": "istanbul cover node_modules/mocha/bin/_mocha test",
+    "preci": "npm run pretest",
+    "ci": "istanbul cover node_modules/mocha/bin/_mocha test --report lcovonly && cat ./coverage/lcov.info | coveralls",
     "predoc": "cat readme-header.md > README.md",
     "doc": "jsdoc2md --src \"lib/*.js\" >> README.md"
   },
@@ -35,6 +37,7 @@
   "homepage": "https://github.com/Joris-van-der-Wel/jsonbird#readme",
   "devDependencies": {
     "chai": "^3.5.0",
+    "coveralls": "^2.11.15",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-eslint": "^18.1.0",
