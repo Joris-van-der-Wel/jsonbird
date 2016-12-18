@@ -12,7 +12,7 @@ class PromiseFateTracker {
     track(name, promise) {
         this.fates.set(name, {promise});
 
-        return promise.then(
+        promise.then(
             result => {
                 this.fates.set(name, {promise, resolve: result});
 
@@ -20,8 +20,6 @@ class PromiseFateTracker {
             },
             error => {
                 this.fates.set(name, {promise, reject: error});
-
-                throw error;
             }
         );
     }
