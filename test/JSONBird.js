@@ -17,11 +17,12 @@ describe('JSONBird', () => {
     describe('RPCRequestError', () => {
         it('should construct properly', () => {
             function myTestFunction() {
-                return new RPCRequestError('Hello!');
+                return new RPCRequestError(Error('Hello!'));
             }
 
             const error = myTestFunction();
             assert.instanceOf(error, Error);
+            assert.instanceOf(error, RPCRequestError);
             assert.strictEqual(error.name, 'RPCRequestError');
             assert.strictEqual(error.message, 'Hello!');
             assert.isString(error.stack);
@@ -29,21 +30,24 @@ describe('JSONBird', () => {
             assert.strictEqual(error.code, 0);
             assert.property(error, 'data');
             assert.isUndefined(error.data);
+            assert.isString(error.toString());
+            assert.include(error.toString(), 'RPCRequestError');
+            assert.include(error.toString(), 'Hello!');
 
-            const error2 = new RPCRequestError('Hello!', 1234, {foo: [{bar: 'baz'}]});
+            const error2 = new RPCRequestError(Error('Hello!'), 1234, {foo: [{bar: 'baz'}]});
             assert.strictEqual(error2.code, 1234);
             assert.deepEqual(error2.data, {foo: [{bar: 'baz'}]});
 
-            assert.match((new RPCRequestError('', -32700)).message, /parse error/i);
-            assert.match((new RPCRequestError('', -32600)).message, /invalid request/i);
-            assert.match((new RPCRequestError('', -32601)).message, /method not found/i);
-            assert.match((new RPCRequestError('', -32602)).message, /invalid params/i);
-            assert.match((new RPCRequestError('', -32603)).message, /internal error/i);
-            assert.match((new RPCRequestError('', -32000)).message, /timed out/i);
-            assert.match((new RPCRequestError('', -32099)).message, /server error/i);
-            assert.match((new RPCRequestError('', -32050)).message, /server error/i);
-            assert.match((new RPCRequestError('', -32001)).message, /server error/i);
-            assert.strictEqual((new RPCRequestError('', 123)).message, '');
+            assert.match((new RPCRequestError(Error(''), -32700)).message, /parse error/i);
+            assert.match((new RPCRequestError(Error(''), -32600)).message, /invalid request/i);
+            assert.match((new RPCRequestError(Error(''), -32601)).message, /method not found/i);
+            assert.match((new RPCRequestError(Error(''), -32602)).message, /invalid params/i);
+            assert.match((new RPCRequestError(Error(''), -32603)).message, /internal error/i);
+            assert.match((new RPCRequestError(Error(''), -32000)).message, /timed out/i);
+            assert.match((new RPCRequestError(Error(''), -32099)).message, /server error/i);
+            assert.match((new RPCRequestError(Error(''), -32050)).message, /server error/i);
+            assert.match((new RPCRequestError(Error(''), -32001)).message, /server error/i);
+            assert.strictEqual((new RPCRequestError(Error(''), 123)).message, '');
         });
     });
 
@@ -363,6 +367,7 @@ describe('JSONBird', () => {
                 assert(false);
             }, error => {
                 assert.instanceOf(error, RPCRequestError);
+                assert.instanceOf(error, Error);
                 assert.strictEqual(error.name, 'RPCRequestError');
                 assert.strictEqual(error.code, -32601);
                 assert.strictEqual(error.message, 'Method not found');
@@ -410,6 +415,7 @@ describe('JSONBird', () => {
                 // eslint-disable-next-line prefer-const
                 for (let error of errors) {
                     assert.instanceOf(error, RPCRequestError);
+                    assert.instanceOf(error, Error);
                     assert.strictEqual(error.name, 'RPCRequestError');
                     assert.strictEqual(error.code, -32601);
                     assert.strictEqual(error.message, 'Method not found');
