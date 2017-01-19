@@ -1,6 +1,6 @@
 'use strict';
 
-/*eslint-env node*/
+/* eslint-env node */
 
 module.exports = function(grunt) {
     grunt.initConfig({
@@ -10,25 +10,16 @@ module.exports = function(grunt) {
             },
             src: ['Gruntfile.js', 'lib/**/*.js'],
         },
-        jscs: {
-            options: {
-                config: '.jscsrc',
-            },
-            src: ['Gruntfile.js', 'lib/**/*.js'],
-        },
         pkg: grunt.file.readJSON('package.json'),
     });
 
-    grunt.loadNpmTasks('grunt-jscs');
     grunt.loadNpmTasks('grunt-eslint');
 
     grunt.registerTask('default', [
-        'jscs',
         'eslint',
     ]);
 
     grunt.registerTask('lint', [
-        'jscs',
         'eslint',
     ]);
 };

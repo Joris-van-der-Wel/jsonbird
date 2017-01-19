@@ -5,6 +5,7 @@
 const {describe, it, beforeEach} = require('mocha-sugar-free');
 const {assert} = require('chai');
 const through = require('through2');
+
 const Wait = require('./Wait');
 const JSONBird = require('../lib/JSONBird');
 
