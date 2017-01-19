@@ -1,6 +1,4 @@
 # JSONBird
-[![Travis CI Build Status](https://api.travis-ci.org/Joris-van-der-Wel/jsonbird.svg?branch=master)](https://travis-ci.org/Joris-van-der-Wel/jsonbird) [![Coverage Status](https://coveralls.io/repos/github/Joris-van-der-Wel/jsonbird/badge.svg?branch=master)](https://coveralls.io/github/Joris-van-der-Wel/jsonbird?branch=master)
-
 JSONBird is a Duplex stream which makes it easy to create a flexible JSON-RPC 2.0 client or server (or a bidirectional combination) over any reliable transport. You can use out of order messaging or an in-order byte stream.
 
 It can parse/emit JSON strings or parse/emit plain-old-javascript-objects in memory.
@@ -130,6 +128,10 @@ over any reliable transport. You can use out of order messaging or an in-order b
 * [JSONBird](#JSONBird)
     * [new JSONBird([optionsArg])](#new_JSONBird_new)
     * _instance_
+        * [.setTimeout](#JSONBird+setTimeout) ⇒ <code>function</code>
+        * [.clearTimeout](#JSONBird+clearTimeout) ⇒ <code>function</code>
+        * [.ended](#JSONBird+ended) ⇒ <code>boolean</code>
+        * [.finished](#JSONBird+finished) ⇒ <code>boolean</code>
         * [.sessionId](#JSONBird+sessionId) ⇒ <code>string</code>
         * [.writableMode](#JSONBird+writableMode) ⇒ <code>string</code>
         * [.readableMode](#JSONBird+readableMode) ⇒ <code>string</code>
@@ -146,6 +148,13 @@ over any reliable transport. You can use out of order messaging or an in-order b
         * [.sendErrorStack](#JSONBird+sendErrorStack)
         * [.defaultTimeout](#JSONBird+defaultTimeout) ⇒ <code>number</code>
         * [.defaultTimeout](#JSONBird+defaultTimeout)
+        * [.pingReceive](#JSONBird+pingReceive) ⇒ <code>boolean</code>
+        * [.isSendingPings](#JSONBird+isSendingPings) ⇒ <code>boolean</code>
+        * [.pingMethod](#JSONBird+pingMethod) ⇒ <code>string</code>
+        * [.pingInterval](#JSONBird+pingInterval) ⇒ <code>number</code>
+        * [.pingInterval](#JSONBird+pingInterval)
+        * [.pingTimeout](#JSONBird+pingTimeout) ⇒ <code>number</code>
+        * [.pingTimeout](#JSONBird+pingTimeout)
         * [.generateId()](#JSONBird+generateId) ⇒ <code>string</code> &#124; <code>number</code>
         * [.waitForPendingResponses()](#JSONBird+waitForPendingResponses) ⇒ <code>Promise</code>
         * [.waitForPendingRequests()](#JSONBird+waitForPendingRequests) ⇒ <code>Promise</code>
@@ -157,6 +166,12 @@ over any reliable transport. You can use out of order messaging or an in-order b
         * [.bindCall(nameOrOptions)](#JSONBird+bindCall) ⇒ <code>function</code>
         * [.notify(nameOrOptions, ...args)](#JSONBird+notify) ⇒ <code>Promise</code>
         * [.bindNotify(nameOrOptions)](#JSONBird+bindNotify) ⇒ <code>function</code>
+        * [.startPinging()](#JSONBird+startPinging)
+        * [.stopPinging()](#JSONBird+stopPinging)
+        * ["error" (error)](#JSONBird+event_error)
+        * ["protocolError" (error)](#JSONBird+event_protocolError)
+        * ["pingSuccess" (delay)](#JSONBird+event_pingSuccess)
+        * ["pingFail" (consecutiveFails, error)](#JSONBird+event_pingFail)
     * _static_
         * [.errorToResponseObject(error, [includeErrorStack])](#JSONBird.errorToResponseObject) ⇒ <code>Object</code>
         * [.isValidVersion(jsonrpc)](#JSONBird.isValidVersion) ⇒ <code>boolean</code>
@@ -181,7 +196,48 @@ over any reliable transport. You can use out of order messaging or an in-order b
 | [optionsArg.endOfJSONWhitespace=] | <code>string</code> |  |  |
 | [optionsArg.endOnFinish] | <code>boolean</code> | <code>true</code> |  |
 | [optionsArg.finishOnEnd] | <code>boolean</code> | <code>true</code> |  |
+| [optionsArg.pingReceive] | <code>boolean</code> | <code>true</code> |  |
+| [optionsArg.pingMethod] | <code>string</code> | <code>&quot;&#x27;jsonbird.ping&#x27;&quot;</code> |  |
+| [optionsArg.pingInterval] | <code>number</code> | <code>2000</code> |  |
+| [optionsArg.pingTimeout] | <code>number</code> | <code>1000</code> |  |
+| [optionsArg.pingNow] | <code>number</code> | <code>Date.now</code> | Timer function used to figure out ping delays |
+| [optionsArg.setTimeout] | <code>function</code> | <code>global.setTimeout</code> |  |
+| [optionsArg.clearTimeout] | <code>function</code> | <code>global.clearTimeout</code> |  |
 
+<a name="JSONBird+setTimeout"></a>
+
+### jsonBird.setTimeout ⇒ <code>function</code>
+The HTML setTimeout function
+
+This function may be overridden for unit tests
+
+**Kind**: instance property of <code>[JSONBird](#JSONBird)</code>  
+**Returns**: <code>function</code> - https://html.spec.whatwg.org/#dom-settimeout  
+<a name="JSONBird+clearTimeout"></a>
+
+### jsonBird.clearTimeout ⇒ <code>function</code>
+The HTML clearTimeout function
+
+This function may be overridden for unit tests
+
+**Kind**: instance property of <code>[JSONBird](#JSONBird)</code>  
+**Returns**: <code>function</code> - https://html.spec.whatwg.org/#dom-cleartimeout  
+<a name="JSONBird+ended"></a>
+
+### jsonBird.ended ⇒ <code>boolean</code>
+Has the readable side of this duplex stream been ended?
+
+(has the 'end' event been emitted)
+
+**Kind**: instance property of <code>[JSONBird](#JSONBird)</code>  
+<a name="JSONBird+finished"></a>
+
+### jsonBird.finished ⇒ <code>boolean</code>
+Has the writable side of this duplex stream been finished?
+
+(has the 'finish' event been emitted)
+
+**Kind**: instance property of <code>[JSONBird](#JSONBird)</code>  
 <a name="JSONBird+sessionId"></a>
 
 ### jsonBird.sessionId ⇒ <code>string</code>
@@ -371,6 +427,64 @@ The timeout to use for an outgoing method call unless a different timeout was ex
 | --- | --- |
 | value | <code>number</code> | 
 
+<a name="JSONBird+pingReceive"></a>
+
+### jsonBird.pingReceive ⇒ <code>boolean</code>
+If `true` a method with the name `this.pingMethod` is added which simply returns true as fast as possible.
+
+**Kind**: instance property of <code>[JSONBird](#JSONBird)</code>  
+<a name="JSONBird+isSendingPings"></a>
+
+### jsonBird.isSendingPings ⇒ <code>boolean</code>
+Are we currently sending pings to our peer?
+
+In other words, has `this.startPinging()` been called?
+
+**Kind**: instance property of <code>[JSONBird](#JSONBird)</code>  
+<a name="JSONBird+pingMethod"></a>
+
+### jsonBird.pingMethod ⇒ <code>string</code>
+The method name used when receiving or sending pings.
+
+**Kind**: instance property of <code>[JSONBird](#JSONBird)</code>  
+<a name="JSONBird+pingInterval"></a>
+
+### jsonBird.pingInterval ⇒ <code>number</code>
+The time (in milliseconds) between each ping if `isSendingPings` is true.
+This time is in addition to the time spent waiting for the previous ping to settle.
+
+**Kind**: instance property of <code>[JSONBird](#JSONBird)</code>  
+**Returns**: <code>number</code> - milliseconds  
+<a name="JSONBird+pingInterval"></a>
+
+### jsonBird.pingInterval
+The time (in milliseconds) between each ping if `isSendingPings` is true.
+This time is in addition to the time spent waiting for the previous ping to settle.
+
+**Kind**: instance property of <code>[JSONBird](#JSONBird)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>number</code> | milliseconds |
+
+<a name="JSONBird+pingTimeout"></a>
+
+### jsonBird.pingTimeout ⇒ <code>number</code>
+The maximum amount of time (in milliseconds) to wait for a ping method call to resolve.
+
+**Kind**: instance property of <code>[JSONBird](#JSONBird)</code>  
+**Returns**: <code>number</code> - milliseconds  
+<a name="JSONBird+pingTimeout"></a>
+
+### jsonBird.pingTimeout
+The maximum amount of time (in milliseconds) to wait for a ping method call to resolve.
+
+**Kind**: instance property of <code>[JSONBird](#JSONBird)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>number</code> | milliseconds |
+
 <a name="JSONBird+generateId"></a>
 
 ### jsonBird.generateId() ⇒ <code>string</code> &#124; <code>number</code>
@@ -542,6 +656,75 @@ userDeleted(123)
 | nameOrOptions | <code>string</code> &#124; <code>Object</code> | The method name or an options object |
 | nameOrOptions.name | <code>string</code> | The method name |
 | nameOrOptions.timeout | <code>number</code> | A maximum time (in milliseconds) to wait for a response. The returned promise will reject                 after this time. |
+
+<a name="JSONBird+startPinging"></a>
+
+### jsonBird.startPinging()
+Start pinging our peer periodically.
+
+A ping is a remote method call with the name `this.pingMethod`. This method is called every `this.pingInterval`,
+with a timeout of `this.pingTimeout`. The events 'pingSuccess' and 'pingFail' are emitted based on the results
+of the call. The property `this.isSendingPings` can be read to find out if pings are currently being sent.
+
+When you are done, make sure to either call stopPinging() or end/finish this stream if pinging is enabled,
+otherwise you will leak resources.
+
+**Kind**: instance method of <code>[JSONBird](#JSONBird)</code>  
+<a name="JSONBird+stopPinging"></a>
+
+### jsonBird.stopPinging()
+Stop the periodic ping (if previously enabled by `startPinging()`).
+
+**Kind**: instance method of <code>[JSONBird](#JSONBird)</code>  
+<a name="JSONBird+event_error"></a>
+
+### "error" (error)
+This event is fired if an uncaught error occurred
+
+Most errors end up at the caller of our functions or at the remote peer, instead of this event.
+Note that if you do not listen for this event on node.js, your process might exit.
+
+**Kind**: event emitted by <code>[JSONBird](#JSONBird)</code>  
+
+| Param | Type |
+| --- | --- |
+| error | <code>Error</code> | 
+
+<a name="JSONBird+event_protocolError"></a>
+
+### "protocolError" (error)
+This event is fired if our peer sent us something that we were unable to parse.
+
+These kind of errors do not end up at the 'error' event
+
+**Kind**: event emitted by <code>[JSONBird](#JSONBird)</code>  
+
+| Param | Type |
+| --- | --- |
+| error | <code>Error</code> | 
+
+<a name="JSONBird+event_pingSuccess"></a>
+
+### "pingSuccess" (delay)
+The most recent ping sent to our peer succeeded
+
+**Kind**: event emitted by <code>[JSONBird](#JSONBird)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| delay | <code>number</code> | How long the ping took to resolve (in milliseconds) |
+
+<a name="JSONBird+event_pingFail"></a>
+
+### "pingFail" (consecutiveFails, error)
+The most recent ping sent to our peer timed out or resulted in an error
+
+**Kind**: event emitted by <code>[JSONBird](#JSONBird)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| consecutiveFails | <code>number</code> | The amount of consecutive pings that failed |
+| error | <code>Error</code> |  |
 
 <a name="JSONBird.errorToResponseObject"></a>
 
