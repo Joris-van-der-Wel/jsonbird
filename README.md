@@ -82,7 +82,8 @@ const webSocketServer = createWebSocketServer({server}, wsStream => {
 ## WebSocket client (browser)
 
 ```javascript
-const JSONBird = require('jsonbird'); // e.g. browserify
+// this example should be bundled using browserify or webpack
+const JSONBird = require('jsonbird');
 const {WebSocket} = window;
 
 const rpc = new JSONBird({
@@ -91,29 +92,94 @@ const rpc = new JSONBird({
 });
 
 const connect = () => {
-    const ws = new WebSocket('ws://localhost:1234/');
-    ws.binaryType = 'arraybuffer';
+  const ws = new WebSocket('ws://localhost:1234/');
+  ws.binaryType = 'arraybuffer';
 
-    const rpcOnData = str => ws.send(str);
+  const rpcOnData = str => ws.send(str);
 
-    ws.onopen = () => {
-      rpc.on('data', rpcOnData);
+  ws.onopen = () => {
+    rpc.on('data', rpcOnData);
 
-      rpc.call('add', 10, 3)
-        .then(result => rpc.call('subtract', result, 1))
-        .then(result => console.log('result:', result)) // 12
-        ;
-    };
-    ws.onclose = () => {
-      rpc.removeListener('data', rpcOnData);
-    };
-    ws.onmessage = e => {
-      const data = Buffer.from(e.data);
-      rpc.write(data);
-    };
+    rpc.call('add', 10, 3)
+      .then(result => rpc.call('subtract', result, 1))
+      .then(result => console.log('result:', result)) // 12
+      ;
+  };
+  ws.onclose = () => {
+    rpc.removeListener('data', rpcOnData);
+  };
+  ws.onmessage = e => {
+    const data = Buffer.from(e.data);
+    rpc.write(data);
+  };
 };
 
 connect();
+```
+
+## WebWorker
+```javascript
+// this example should be bundled using browserify or webpack
+const JSONBird = require('jsonbird');
+const {WebSocket} = window;
+const worker = new Worker('myWorker.js');
+const rpc = new JSONBird({
+    // take advantage of the structured clone algorithm
+    readableMode: 'object',
+    writableMode: 'object',
+    receiveErrorStack: true,
+    sendErrorStack: true,
+});
+worker.onmessage = e => rpc.write(e.data);
+rpc.on('data', object => worker.postMessage(object));
+```
+
+__myWorker.js__:
+```javascript
+// this example should be bundled using browserify or webpack
+const JSONBird = require('jsonbird');
+const rpc = new JSONBird({
+  readableMode: 'object',
+  writableMode: 'object',
+  receiveErrorStack: true,
+  sendErrorStack: true,
+});
+self.onmessage = e => rpc.write(e.data);
+rpc.on('data', object => context.postMessage(object));
+```
+
+## Shared WebWorker
+```javascript
+// this example should be bundled using browserify or webpack
+const JSONBird = require('jsonbird');
+const {WebSocket} = window;
+const worker = new SharedWorker('mySharedWorker.js');
+const rpc = new JSONBird({
+    // take advantage of the structured clone algorithm
+    readableMode: 'object',
+    writableMode: 'object',
+    receiveErrorStack: true,
+    sendErrorStack: true,
+});
+worker.port.onmessage = e => rpc.write(e.data);
+rpc.on('data', object => worker.port.postMessage(object));
+```
+
+__mySharedWorker.js__:
+```javascript
+// this example should be bundled using browserify or webpack
+const JSONBird = require('jsonbird');
+const rpc = new JSONBird({
+  readableMode: 'object',
+  writableMode: 'object',
+  receiveErrorStack: true,
+  sendErrorStack: true,
+});
+self.onconnect = e => {
+    const port = e.ports[0];
+    port.onmessage = e => rpc.write(e.data);
+    rpc.on('data', object => port.postMessage(object));
+};
 ```
 
 # API Documentation
@@ -168,6 +234,7 @@ over any reliable transport. You can use out of order messaging or an in-order b
         * [.bindNotify(nameOrOptions)](#JSONBird+bindNotify) ⇒ <code>function</code>
         * [.startPinging()](#JSONBird+startPinging)
         * [.stopPinging()](#JSONBird+stopPinging)
+        * [.resetPingStatistics()](#JSONBird+resetPingStatistics)
         * ["error" (error)](#JSONBird+event_error)
         * ["protocolError" (error)](#JSONBird+event_protocolError)
         * ["pingSuccess" (delay)](#JSONBird+event_pingSuccess)
@@ -674,6 +741,14 @@ otherwise you will leak resources.
 
 ### jsonBird.stopPinging()
 Stop the periodic ping (if previously enabled by `startPinging()`).
+
+**Kind**: instance method of <code>[JSONBird](#JSONBird)</code>  
+<a name="JSONBird+resetPingStatistics"></a>
+
+### jsonBird.resetPingStatistics()
+Resets all statistics which are reported by ping events.
+
+Currently this method only sets `pingConsecutiveFails` to 1 for the next `pingFail` event
 
 **Kind**: instance method of <code>[JSONBird](#JSONBird)</code>  
 <a name="JSONBird+event_error"></a>
