@@ -356,6 +356,52 @@ describe('JSONBird handling pings', () => {
         });
     });
 
+    it('should reset pingConsecutiveFails when resetPingStatistics() is called', () => {
+        const rpc = new JSONBird({
+            sessionId: null,
+            writableMode: 'object',
+            readableMode: 'object',
+            pingInterval: 4567,
+            pingTimeout: 1234,
+            setTimeout,
+            clearTimeout,
+        });
+
+        rpc.on('protocolError', error => console.error(error));
+        addPingEvents(rpc);
+        readStream.pipe(rpc);
+        rpc.pipe(writeStream);
+
+        rpc.startPinging();
+        timerCalls[0].func(); // it is time to send a ping
+
+        return writeWait.wait(1).then(() => {
+            assert.strictEqual(timerCalls[1].timeout, 1234);
+            timerCalls[1].func(); // the call took too long
+
+            return pingEventWait.wait(1);
+        }).then(() => {
+            assert.lengthOf(pingEvents, 1);
+            assert.strictEqual(pingEvents[0].consecutiveFails, 1);
+
+            assert.strictEqual(timerCalls[2].timeout, 4567);
+            timerCalls[2].func(); // it is time to send a ping
+
+            return writeWait.wait(1);
+        }).then(() => {
+            rpc.resetPingStatistics();
+
+            assert.strictEqual(timerCalls[3].timeout, 1234);
+            timerCalls[3].func(); // the call took too long
+
+            return pingEventWait.wait(1);
+        }).then(() => {
+            assert.lengthOf(pingEvents, 2);
+            assert.strictEqual(pingEvents[0].consecutiveFails, 1);
+            rpc.stopPinging();
+        });
+    });
+
     it('should stop pinging on finish', () => {
         const rpc = new JSONBird({
             sessionId: null,
