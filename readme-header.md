@@ -91,26 +91,26 @@ const rpc = new JSONBird({
 });
 
 const connect = () => {
-    const ws = new WebSocket('ws://localhost:1234/');
-    ws.binaryType = 'arraybuffer';
+  const ws = new WebSocket('ws://localhost:1234/');
+  ws.binaryType = 'arraybuffer';
 
-    const rpcOnData = str => ws.send(str);
+  const rpcOnData = str => ws.send(str);
 
-    ws.onopen = () => {
-      rpc.on('data', rpcOnData);
+  ws.onopen = () => {
+    rpc.on('data', rpcOnData);
 
-      rpc.call('add', 10, 3)
-        .then(result => rpc.call('subtract', result, 1))
-        .then(result => console.log('result:', result)) // 12
-        ;
-    };
-    ws.onclose = () => {
-      rpc.removeListener('data', rpcOnData);
-    };
-    ws.onmessage = e => {
-      const data = Buffer.from(e.data);
-      rpc.write(data);
-    };
+    rpc.call('add', 10, 3)
+      .then(result => rpc.call('subtract', result, 1))
+      .then(result => console.log('result:', result)) // 12
+      ;
+  };
+  ws.onclose = () => {
+    rpc.removeListener('data', rpcOnData);
+  };
+  ws.onmessage = e => {
+    const data = Buffer.from(e.data);
+    rpc.write(data);
+  };
 };
 
 connect();
