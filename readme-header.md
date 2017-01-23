@@ -82,7 +82,8 @@ const webSocketServer = createWebSocketServer({server}, wsStream => {
 ## WebSocket client (browser)
 
 ```javascript
-const JSONBird = require('jsonbird'); // e.g. browserify
+// this example should be bundled using browserify or webpack
+const JSONBird = require('jsonbird');
 const {WebSocket} = window;
 
 const rpc = new JSONBird({
@@ -114,6 +115,71 @@ const connect = () => {
 };
 
 connect();
+```
+
+## WebWorker
+```javascript
+// this example should be bundled using browserify or webpack
+const JSONBird = require('jsonbird');
+const {WebSocket} = window;
+const worker = new Worker('myWorker.js');
+const rpc = new JSONBird({
+    // take advantage of the structured clone algorithm
+    readableMode: 'object',
+    writableMode: 'object',
+    receiveErrorStack: true,
+    sendErrorStack: true,
+});
+worker.onmessage = e => rpc.write(e.data);
+rpc.on('data', object => worker.postMessage(object));
+```
+
+__myWorker.js__:
+```javascript
+// this example should be bundled using browserify or webpack
+const JSONBird = require('jsonbird');
+const rpc = new JSONBird({
+  readableMode: 'object',
+  writableMode: 'object',
+  receiveErrorStack: true,
+  sendErrorStack: true,
+});
+self.onmessage = e => rpc.write(e.data);
+rpc.on('data', object => context.postMessage(object));
+```
+
+## Shared WebWorker
+```javascript
+// this example should be bundled using browserify or webpack
+const JSONBird = require('jsonbird');
+const {WebSocket} = window;
+const worker = new SharedWorker('mySharedWorker.js');
+const rpc = new JSONBird({
+    // take advantage of the structured clone algorithm
+    readableMode: 'object',
+    writableMode: 'object',
+    receiveErrorStack: true,
+    sendErrorStack: true,
+});
+worker.port.onmessage = e => rpc.write(e.data);
+rpc.on('data', object => worker.port.postMessage(object));
+```
+
+__mySharedWorker.js__:
+```javascript
+// this example should be bundled using browserify or webpack
+const JSONBird = require('jsonbird');
+const rpc = new JSONBird({
+  readableMode: 'object',
+  writableMode: 'object',
+  receiveErrorStack: true,
+  sendErrorStack: true,
+});
+self.onconnect = e => {
+    const port = e.ports[0];
+    port.onmessage = e => rpc.write(e.data);
+    rpc.on('data', object => port.postMessage(object));
+};
 ```
 
 # API Documentation
