@@ -1,6 +1,6 @@
 {
   "name": "jsonbird",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "JSON-RPC 2.0 client/server/peer for any reliable transport. Inter-process communication. REST. WebSocket. WebWorker. Out of order messaging or in-order byte streams",
   "main": "lib/JSONBird.js",
   "scripts": {
