@@ -1031,14 +1031,14 @@ describe('JSONBird handling object streams', () => {
 
             // Handle this as a response object explicitly, otherwise we report the error as an invalid request
             rpc.handleResponseObject({jsonrpc: '2.0', id: 0})
-                .then(
-                    () => assert(false),
-                    error => {
-                        assert.instanceOf(error, RPCResponseError);
-                        assert.strictEqual(error.name, 'RPCResponseError');
-                        assert.strictEqual(error.message, 'Invalid Response: Must have a "error" or an "result" property');
-                    }
-                );
+            .then(
+                () => assert(false),
+                error => {
+                    assert.instanceOf(error, RPCResponseError);
+                    assert.strictEqual(error.name, 'RPCResponseError');
+                    assert.strictEqual(error.message, 'Invalid Response: Must have a "error" or an "result" property');
+                }
+            );
 
             return Promise.all([
                 streamWrite(readStream, {result: 19, id: 0}), // missing jsonrpc

@@ -114,7 +114,19 @@
             "error",
             4,
             {
-                "SwitchCase": 1
+                "MemberExpression": 0,
+                "SwitchCase": 1,
+                "FunctionDeclaration": {
+                    "parameters": 1,
+                    "body": 1
+                },
+                "FunctionExpression": {
+                    "parameters": 1,
+                    "body": 1
+                },
+                "CallExpression": {
+                    "arguments": 1
+                }
             }
         ],
         "key-spacing": [

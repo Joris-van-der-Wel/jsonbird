@@ -164,20 +164,25 @@ describe('JSONBird', () => {
             const rpc = new JSONBird();
 
             return Promise.all([
-                rpc.callLocalAndSendResponse({}, 'bla')       .then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*valid id/i)),
+                rpc.callLocalAndSendResponse({}, 'bla')
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*valid id/i)),
 
-                rpc.callLocalAndSendResponse(undefined, 'bla').then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*valid id/i)),
+                rpc.callLocalAndSendResponse(undefined, 'bla')
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*valid id/i)),
 
-                rpc.callLocalAndSendResponse(null, 'bla')     .then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*valid id/i)),
+                rpc.callLocalAndSendResponse(null, 'bla')
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*valid id/i)),
 
-                rpc.callLocalAndSendResponse({}, 'bla')       .then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*valid id/i)),
+                rpc.callLocalAndSendResponse({}, 'bla')
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*valid id/i)),
 
-                rpc.callLocalAndSendResponse(undefined, 'bla').then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*valid id/i)),
+                rpc.callLocalAndSendResponse(undefined, 'bla')
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*valid id/i)),
             ]);
         });
 
@@ -186,17 +191,21 @@ describe('JSONBird', () => {
 
             /* eslint no-useless-call: 'off' */
             return Promise.all([
-                rpc.call()    .then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*must.*string.*object/i)),
+                rpc.call()
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*must.*string.*object/i)),
 
-                rpc.call({})  .then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*must.*string.*object/i)),
+                rpc.call({})
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*must.*string.*object/i)),
 
-                rpc.call(null).then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*must.*string.*object/i)),
+                rpc.call(null)
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*must.*string.*object/i)),
 
-                rpc.call(123).then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*must.*string.*object/i)),
+                rpc.call(123)
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*must.*string.*object/i)),
             ]);
         });
 
@@ -204,17 +213,21 @@ describe('JSONBird', () => {
             const rpc = new JSONBird();
 
             return Promise.all([
-                rpc.notifyLocal()    .then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*must.*string/i)),
+                rpc.notifyLocal()
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*must.*string/i)),
 
-                rpc.notifyLocal({})  .then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*must.*string/i)),
+                rpc.notifyLocal({})
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*must.*string/i)),
 
-                rpc.notifyLocal(null).then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*must.*string/i)),
+                rpc.notifyLocal(null)
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*must.*string/i)),
 
-                rpc.notifyLocal(123).then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*must.*string/i)),
+                rpc.notifyLocal(123)
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*must.*string/i)),
             ]);
         });
 
@@ -222,17 +235,21 @@ describe('JSONBird', () => {
             const rpc = new JSONBird();
 
             return Promise.all([
-                rpc.notify()    .then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*must.*string.*object/i)),
+                rpc.notify()
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*must.*string.*object/i)),
 
-                rpc.notify({})  .then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*must.*string.*object/i)),
+                rpc.notify({})
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*must.*string.*object/i)),
 
-                rpc.notify(null).then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*must.*string.*object/i)),
+                rpc.notify(null)
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*must.*string.*object/i)),
 
-                rpc.notify(123).then(() => assert(false))
-                    .catch(error => assert.match(error.message, /argument.*must.*string.*object/i)),
+                rpc.notify(123)
+                .then(() => assert(false))
+                .catch(error => assert.match(error.message, /argument.*must.*string.*object/i)),
             ]);
         });
     });
@@ -283,8 +300,8 @@ describe('JSONBird', () => {
             rpc.methods(object);
 
             return rpc.callLocal('add', 10, 3)
-                .then(result => rpc.callLocal('divide', result, 2))
-                .then(result => assert.strictEqual(result, 6.5));
+            .then(result => rpc.callLocal('divide', result, 2))
+            .then(result => assert.strictEqual(result, 6.5));
         });
 
         it('should accept multiple functions using multiple objects', {expectPromise}, () => {
@@ -312,9 +329,9 @@ describe('JSONBird', () => {
             rpc.methods(object1);
 
             return rpc.callLocal('add', 10, 3)
-                .then(result => rpc.callLocal('divide', result, 2))
-                .then(result => rpc.callLocal('subtract', result, 1))
-                .then(result => assert.strictEqual(result, 5.5));
+            .then(result => rpc.callLocal('divide', result, 2))
+            .then(result => rpc.callLocal('subtract', result, 1))
+            .then(result => assert.strictEqual(result, 5.5));
         });
 
         it('should override a function with the same name', {expectPromise}, () => {
@@ -332,7 +349,7 @@ describe('JSONBird', () => {
             rpc.methods(object1);
 
             return rpc.callLocal('divide', 10, 4)
-                .then(result => assert.strictEqual(result, 2.5));
+            .then(result => assert.strictEqual(result, 2.5));
         });
 
         it('should accept multiple functions using a Map', {expectPromise}, () => {
@@ -351,8 +368,8 @@ describe('JSONBird', () => {
             ]));
 
             return rpc.callLocal('add', 10, 3)
-                .then(result => rpc.callLocal('divide', result, 2))
-                .then(result => assert.strictEqual(result, 6.5));
+            .then(result => rpc.callLocal('divide', result, 2))
+            .then(result => assert.strictEqual(result, 6.5));
         });
 
         it('should throw for methods that do not exist', () => {
@@ -433,9 +450,9 @@ describe('JSONBird', () => {
             });
 
             return rpc.callLocal('hasOwnProperty', 10, 3)
-                .then(result => rpc.callLocal('valueOf', result, 2))
-                .then(result => rpc.callLocal('propertyIsEnumerable', result, 1))
-                .then(result => assert.strictEqual(result, 5.5));
+            .then(result => rpc.callLocal('valueOf', result, 2))
+            .then(result => rpc.callLocal('propertyIsEnumerable', result, 1))
+            .then(result => assert.strictEqual(result, 5.5));
         });
 
         it('should allow calling Object builtins if they have been redefined on a subclass', () => {
@@ -460,9 +477,9 @@ describe('JSONBird', () => {
             rpc.methods(new Foo());
 
             return rpc.callLocal('hasOwnProperty', 10, 3)
-                .then(result => rpc.callLocal('valueOf', result, 2))
-                .then(result => rpc.callLocal('propertyIsEnumerable', result, 1))
-                .then(result => assert.strictEqual(result, 5.5));
+            .then(result => rpc.callLocal('valueOf', result, 2))
+            .then(result => rpc.callLocal('propertyIsEnumerable', result, 1))
+            .then(result => assert.strictEqual(result, 5.5));
         });
 
         it('should allow calling Object builtins if they have been redefined and Object.create(null) was used', () => {
@@ -475,9 +492,9 @@ describe('JSONBird', () => {
             rpc.methods(object);
 
             return rpc.callLocal('hasOwnProperty', 10, 3)
-                .then(result => rpc.callLocal('valueOf', result, 2))
-                .then(result => rpc.callLocal('propertyIsEnumerable', result, 1))
-                .then(result => assert.strictEqual(result, 5.5));
+            .then(result => rpc.callLocal('valueOf', result, 2))
+            .then(result => rpc.callLocal('propertyIsEnumerable', result, 1))
+            .then(result => assert.strictEqual(result, 5.5));
         });
 
         it('should throw for invalid arguments', () => {
