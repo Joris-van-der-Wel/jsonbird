@@ -145,7 +145,7 @@ const rpc = new JSONBird({
   sendErrorStack: true,
 });
 self.onmessage = e => rpc.write(e.data);
-rpc.on('data', object => context.postMessage(object));
+rpc.on('data', object => self.postMessage(object));
 ```
 
 ## Shared WebWorker
