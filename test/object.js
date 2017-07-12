@@ -745,7 +745,7 @@ describe('JSONBird handling object streams', () => {
             assert.strictEqual(rpc.clientPending, 0);
             fates.track(0, rpc.call('foo'));
             assert.strictEqual(rpc.clientPending, 1);
-            fates.track(1, rpc.call('foo', 10));
+            fates.track(1, rpc.call({name: 'foo', timeout: 60000}, 10));
             const foo = rpc.bindCall('foo');
             fates.track(2, foo(10, 'bar'));
             fates.track(3, foo({bar: 10, arrayz: [50, 'bla']}));
@@ -1122,6 +1122,28 @@ describe('JSONBird handling object streams', () => {
                 fates.assertRejected(1, RPCRequestError, /^Remote Call timed out after 9ms$/i);
                 assert.strictEqual(fates.getFate(0).reject.code, -32000);
                 assert.strictEqual(fates.getFate(1).reject.code, -32000);
+            });
+        });
+
+        it('Should not mask the error if setTimeout throws', () => {
+            const rpc = new JSONBird({
+                sessionId: null,
+                writableMode: 'object',
+                readableMode: 'object',
+                setTimeout: () => {
+                    throw Error('Foo BAR!');
+                },
+            });
+
+            const fates = new PromiseFateTracker();
+            fates.track(0, rpc.call({name: 'foo', timeout: 5}, 'bar'));
+
+            return fates.waitForAllSettled() // wait until they have all timed out
+            .then(() => {
+                assert.lengthOf(errorEvents, 0);
+                assert.lengthOf(protocolErrorEvents, 0);
+                assert.lengthOf(writeEvents, 0);
+                fates.assertRejected(0, Error, /^Foo BAR!$/i);
             });
         });
 
