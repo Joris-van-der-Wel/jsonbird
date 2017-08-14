@@ -811,7 +811,7 @@ Converts any javascript `Error` object to a JSON-RPC error object
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | error | <code>Error</code> |  | The `message`, `code` and `data` properties of this `error` will be copied over to the resulting object. |
-| [includeErrorStack] | <code>boolean</code> | <code>false</code> | If `true` and `error.data` is `undefined`, the resulting `data` property will be an        object containing the `fileName`, `lineNumber`, `columnNumber` and `stack` of the `error` |
+| [includeErrorStack] | <code>boolean</code> | <code>false</code> | If `true` and `error.data` is `undefined`, the resulting `data` object will contain        a "javascriptError" objecting containing the `fileName`, `lineNumber`, `columnNumber` and `stack` of the `error`. |
 
 <a name="JSONBird.isValidVersion"></a>
 

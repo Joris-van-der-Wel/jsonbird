@@ -316,10 +316,23 @@ describe('JSONBird handling object streams', () => {
                     id: 7,
                 });
 
-                return writeWait.wait(2);
+                readStream.write({
+                    jsonrpc: '2.0',
+                    method: 'throwError',
+                    params: {
+                        fileName: '/var/example.js',
+                        lineNumber: 16,
+                        columnNumber: 50,
+                        stack: 'b@/var/example.js:16\na@/var/example.js:19',
+                        data: {javascriptError: 'bar'}, // sendErrorStack should not replace an existing javascriptError property
+                    },
+                    id: 8,
+                });
+
+                return writeWait.wait(3);
             })
             .then(() => {
-                assert.lengthOf(writeEvents, 8);
+                assert.lengthOf(writeEvents, 9);
                 assert.lengthOf(errorEvents, 0);
                 assert.lengthOf(protocolErrorEvents, 0);
 
@@ -365,12 +378,13 @@ describe('JSONBird handling object streams', () => {
                         code: 0,
                         message: 'A simple error',
                         data: {
-                            isJSError: true,
-                            name: 'Error',
-                            fileName: '/var/example.js',
-                            lineNumber: 16,
-                            columnNumber: 50,
-                            stack: 'b@/var/example.js:16\na@/var/example.js:19',
+                            javascriptError: {
+                                name: 'Error',
+                                fileName: '/var/example.js',
+                                lineNumber: 16,
+                                columnNumber: 50,
+                                stack: 'b@/var/example.js:16\na@/var/example.js:19',
+                            },
                         },
                     },
                     id: 6,
@@ -381,9 +395,30 @@ describe('JSONBird handling object streams', () => {
                     error: {
                         code: 0,
                         message: 'A simple error',
-                        data: {foo: 'bar'},
+                        data: {
+                            foo: 'bar',
+                            javascriptError: {
+                                name: 'Error',
+                                fileName: '/var/example.js',
+                                lineNumber: 16,
+                                columnNumber: 50,
+                                stack: 'b@/var/example.js:16\na@/var/example.js:19',
+                            },
+                        },
                     },
                     id: 7,
+                });
+
+                assert.deepEqual(writeEvents[8], {
+                    jsonrpc: '2.0',
+                    error: {
+                        code: 0,
+                        message: 'A simple error',
+                        data: {
+                            javascriptError: 'bar',
+                        },
+                    },
+                    id: 8,
                 });
             });
         });
@@ -879,12 +914,13 @@ describe('JSONBird handling object streams', () => {
                         code: 123,
                         message: 'foo',
                         data: {
-                            isJSError: true,
-                            name: 'FooError',
-                            stack: testStack,
-                            fileName: 'foo.js',
-                            lineNumber: 123,
-                            columnNumber: 10,
+                            javascriptError: {
+                                name: 'FooError',
+                                stack: testStack,
+                                fileName: 'foo.js',
+                                lineNumber: 123,
+                                columnNumber: 10,
+                            },
                         },
                     },
                     id: 0,
@@ -895,7 +931,7 @@ describe('JSONBird handling object streams', () => {
                         code: 123,
                         message: 'foo',
                         data: {
-                            isJSError: true,
+                            javascriptError: {},
                         },
                     },
                     id: 1,
@@ -906,12 +942,7 @@ describe('JSONBird handling object streams', () => {
                         code: 123,
                         message: 'foo',
                         data: {
-                            isJSError: false,
-                            name: 'FooError',
-                            stack: testStack,
-                            fileName: 'foo.js',
-                            lineNumber: 123,
-                            columnNumber: 10,
+                            javascriptError: 'foo',
                         },
                     },
                     id: 2,
@@ -974,7 +1005,7 @@ describe('JSONBird handling object streams', () => {
                 assert.isUndefined(error3.localStack);
                 assert.isUndefined(error3.remoteStack);
                 assert.notMatch(error3.stack, /cause|remote/i);
-                error3.parseDataAsRemoteStack();
+                error3.parseRemoteJavascriptError();
                 assert.strictEqual(error3.name, 'RPCRequestError<undefined>');
                 assert.strictEqual(error3.message, 'foo');
                 assert.strictEqual(error3.fileName, 'undefined');
@@ -998,12 +1029,13 @@ describe('JSONBird handling object streams', () => {
                     code: 123,
                     message: 'foo',
                     data: {
-                        isJSError: true,
-                        name: 'FooError',
-                        stack: testStack,
-                        fileName: 'foo.js',
-                        lineNumber: 123,
-                        columnNumber: 10,
+                        javascriptError: {
+                            name: 'FooError',
+                            stack: testStack,
+                            fileName: 'foo.js',
+                            lineNumber: 123,
+                            columnNumber: 10,
+                        },
                     },
                 },
                 id: 4,
