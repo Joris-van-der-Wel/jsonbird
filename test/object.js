@@ -1118,8 +1118,8 @@ describe('JSONBird handling object streams', () => {
                     id: 1,
                 });
 
-                fates.assertRejected(0, RPCRequestError, /^Remote Call timed out after 5ms$/i);
-                fates.assertRejected(1, RPCRequestError, /^Remote Call timed out after 9ms$/i);
+                fates.assertRejected(0, RPCRequestError, /^Remote Call "foo" timed out after 5ms$/i);
+                fates.assertRejected(1, RPCRequestError, /^Remote Call "baz" timed out after 9ms$/i);
                 assert.strictEqual(fates.getFate(0).reject.code, -32000);
                 assert.strictEqual(fates.getFate(1).reject.code, -32000);
             });
