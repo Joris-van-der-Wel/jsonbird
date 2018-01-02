@@ -1157,6 +1157,28 @@ describe('JSONBird handling object streams', () => {
             });
         });
 
+        it('should properly cancel calls if the stream finishes', () => {
+            readStream.pipe(rpc);
+            rpc.pipe(writeStream);
+
+            const fates = new PromiseFateTracker();
+
+            fates.track(0, rpc.call({name: 'foo', timeout: 0}, 'bar'));
+            fates.track(1, rpc.call({name: 'baz', timeout: 123456}, 'quux'));
+
+            return writeWait.waitUntil(2)
+            .then(() => {
+                readStream.end();
+                return fates.waitForAllSettled();
+            })
+            .then(() => {
+                fates.assertRejected(0, RPCRequestError, /^JSONBird:.*Writable.*Duplex.*finished.*call was pending/i);
+                fates.assertRejected(1, RPCRequestError, /^JSONBird:.*Writable.*Duplex.*finished.*call was pending/i);
+                assert.strictEqual(fates.getFate(0).reject.code, -32000);
+                assert.strictEqual(fates.getFate(1).reject.code, -32000);
+            });
+        });
+
         it('Should not mask the error if setTimeout throws', () => {
             const rpc = new JSONBird({
                 sessionId: null,
