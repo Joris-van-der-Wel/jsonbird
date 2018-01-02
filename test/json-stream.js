@@ -113,7 +113,7 @@ describe('JSONBird handling string/buffer streams', () => {
                     jsonrpc: '2.0',
                     error: {
                         code: -32700,
-                        message: 'Error parsing your JSON string: Unexpected RIGHT_BRACKET(\"]\") in state COMMA',
+                        message: 'JSONBird: Error parsing your JSON string: Unexpected RIGHT_BRACKET(\"]\") in state COMMA',
                     },
                     id: null,
                 });

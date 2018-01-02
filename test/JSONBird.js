@@ -387,7 +387,7 @@ describe('JSONBird', () => {
                 assert.instanceOf(error, Error);
                 assert.strictEqual(error.name, 'RPCRequestError');
                 assert.strictEqual(error.code, -32601);
-                assert.strictEqual(error.message, 'Method not found');
+                assert.strictEqual(error.message, 'JSONBird: Method not found');
             });
         });
 
@@ -435,7 +435,7 @@ describe('JSONBird', () => {
                     assert.instanceOf(error, Error);
                     assert.strictEqual(error.name, 'RPCRequestError');
                     assert.strictEqual(error.code, -32601);
-                    assert.strictEqual(error.message, 'Method not found');
+                    assert.strictEqual(error.message, 'JSONBird: Method not found');
                 }
             });
         });

@@ -190,18 +190,18 @@ describe('JSONBird handling object streams', () => {
                 };
 
                 // unknown methods (not emitted as a "protocolError"):
-                assertProtocolError(0, -1,    0, -32601, 'Method not found');
-                assertProtocolError(1, -1,    1, -32601, 'Method not found');
+                assertProtocolError(0, -1,    0, -32601, 'JSONBird: Method not found');
+                assertProtocolError(1, -1,    1, -32601, 'JSONBird: Method not found');
 
-                assertProtocolError(2,  0,    2, -32601, 'Method not found: "method" attribute must be a string');
-                assertProtocolError(3,  1, null, -32600, 'Unable to determine if the message was a request or response object (one of' +
-                    ' the "method", "result" or "error" properties must be present)');
-                assertProtocolError(4,  2,    4, -32600, 'Invalid Request: given "jsonrpc" version is not supported');
-                assertProtocolError(5,  3,    5, -32600, 'Invalid Request: "jsonrpc" attribute is missing (JSON-RPC version 1 is not' +
-                    ' supported)');
-                assertProtocolError(6,  4, null, -32600, 'Invalid Request: "id" must be a number or a string');
-                assertProtocolError(7,  5,    7, -32600, 'Invalid Request: "params" must be an array or object');
-                assertProtocolError(8,  6,    8, -32600, 'Invalid Request: "params" must be an array or object');
+                assertProtocolError(2,  0,    2, -32601, 'JSONBird: Method not found: "method" attribute must be a string');
+                assertProtocolError(3,  1, null, -32600, 'JSONBird: Unable to determine if the message was a request or ' +
+                    'response object (one of the "method", "result" or "error" properties must be present)');
+                assertProtocolError(4,  2,    4, -32600, 'JSONBird: Invalid Request: given "jsonrpc" version is not supported');
+                assertProtocolError(5,  3,    5, -32600, 'JSONBird: Invalid Request: "jsonrpc" attribute is missing ' +
+                    '(JSON-RPC version 1 is not supported)');
+                assertProtocolError(6,  4, null, -32600, 'JSONBird: Invalid Request: "id" must be a number or a string');
+                assertProtocolError(7,  5,    7, -32600, 'JSONBird: Invalid Request: "params" must be an array or object');
+                assertProtocolError(8,  6,    8, -32600, 'JSONBird: Invalid Request: "params" must be an array or object');
             });
         }));
 
@@ -1093,27 +1093,27 @@ describe('JSONBird handling object streams', () => {
 
                 assert.strictEqual(
                     protocolErrorEvents[0].message,
-                    'Invalid Response: "jsonrpc" property must be "2.0"'
+                    'JSONBird: Invalid Response: "jsonrpc" property must be "2.0"'
                 );
                 assert.strictEqual(
                     protocolErrorEvents[1].message,
-                    'Invalid Response: "jsonrpc" property must be "2.0"'
+                    'JSONBird: Invalid Response: "jsonrpc" property must be "2.0"'
                 );
                 assert.strictEqual(
                     protocolErrorEvents[2].message,
-                    'Invalid Response: "id" property must be a number or string'
+                    'JSONBird: Invalid Response: "id" property must be a number or string'
                 );
                 assert.strictEqual(
                     protocolErrorEvents[3].message,
-                    'Invalid Response: "id" property must be a number or string'
+                    'JSONBird: Invalid Response: "id" property must be a number or string'
                 );
                 assert.strictEqual(
                     protocolErrorEvents[4].message,
-                    'Invalid Response: The "error" and "result" properties are both present'
+                    'JSONBird: Invalid Response: The "error" and "result" properties are both present'
                 );
                 assert.strictEqual(
                     protocolErrorEvents[5].message,
-                    'Invalid Response: Unknown id'
+                    'JSONBird: Invalid Response: Unknown id'
                 );
             });
         });
@@ -1150,8 +1150,8 @@ describe('JSONBird handling object streams', () => {
                     id: 1,
                 });
 
-                fates.assertRejected(0, RPCRequestError, /^Remote Call "foo" timed out after 5ms$/i);
-                fates.assertRejected(1, RPCRequestError, /^Remote Call "baz" timed out after 9ms$/i);
+                fates.assertRejected(0, RPCRequestError, /^JSONBird: Remote Call "foo" timed out after 5ms$/i);
+                fates.assertRejected(1, RPCRequestError, /^JSONBird: Remote Call "baz" timed out after 9ms$/i);
                 assert.strictEqual(fates.getFate(0).reject.code, -32000);
                 assert.strictEqual(fates.getFate(1).reject.code, -32000);
             });
