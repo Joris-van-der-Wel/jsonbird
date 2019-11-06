@@ -58,7 +58,7 @@ describe('JSONBird handling string/buffer streams in objectMode', () => {
                     writeWait.advance();
                     callback();
                 },
-                () => writeEvents.push(END)
+                () => writeEvents.push(END),
             );
         });
 
@@ -74,7 +74,7 @@ describe('JSONBird handling string/buffer streams in objectMode', () => {
                 readStream.write('{"jsonrpc": "2.0", "method": "いろはにほ", "params": [42,23], "id":0}');
                 readStream.write('{"jsonrpc": "2.0", "method": "foo",       "params": [100, {"foo": "bar ¢ bar € bar 𐍈 bar"}],"id": 1}');
                 readStream.write(
-                    new Buffer('{"jsonrpc": "2.0", "method": "foo",      "params": ["Árvíztűrő tükörfúrógép"],"id": 2}', 'utf8')
+                    new Buffer('{"jsonrpc": "2.0", "method": "foo",      "params": ["Árvíztűrő tükörfúrógép"],"id": 2}', 'utf8'),
                 );
                 readStream.write('{"jsonrpc": "2.0", "method": "foo",      "params": [], "id":3}\n\r\t     ');
                 readStream.write('{"jsonrpc": "2.0", "method": "foo",      "params": [], "id":4}\r\n');
@@ -105,7 +105,7 @@ describe('JSONBird handling string/buffer streams in objectMode', () => {
                 readStream.write('{"foo": 123]}');
                 readStream.write(
                     // two json objects in one message:
-                    '{"jsonrpc": "2.0", "method": "foo", "params": [],"id": 0}{"jsonrpc": "2.0", "method": "foo", "params": [],"id": 1}'
+                    '{"jsonrpc": "2.0", "method": "foo", "params": [],"id": 0}{"jsonrpc": "2.0", "method": "foo", "params": [],"id": 1}',
                 );
 
                 return writeWait.wait(3);
@@ -168,7 +168,7 @@ describe('JSONBird handling string/buffer streams in objectMode', () => {
                     writeWait.advance();
                     callback();
                 },
-                () => writeEvents.push(END)
+                () => writeEvents.push(END),
             );
         });
 

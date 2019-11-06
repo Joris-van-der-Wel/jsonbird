@@ -137,7 +137,7 @@ describe('JSONBird handling object streams', () => {
             () => {
                 writeWait.advance();
                 writeEvents.push(FINISH);
-            }
+            },
         );
     });
 
@@ -1069,7 +1069,7 @@ describe('JSONBird handling object streams', () => {
                     assert.instanceOf(error, RPCResponseError);
                     assert.strictEqual(error.name, 'RPCResponseError');
                     assert.strictEqual(error.message, 'Invalid Response: Must have a "error" or an "result" property');
-                }
+                },
             );
 
             return Promise.all([
@@ -1093,27 +1093,27 @@ describe('JSONBird handling object streams', () => {
 
                 assert.strictEqual(
                     protocolErrorEvents[0].message,
-                    'JSONBird: Invalid Response: "jsonrpc" property must be "2.0"'
+                    'JSONBird: Invalid Response: "jsonrpc" property must be "2.0"',
                 );
                 assert.strictEqual(
                     protocolErrorEvents[1].message,
-                    'JSONBird: Invalid Response: "jsonrpc" property must be "2.0"'
+                    'JSONBird: Invalid Response: "jsonrpc" property must be "2.0"',
                 );
                 assert.strictEqual(
                     protocolErrorEvents[2].message,
-                    'JSONBird: Invalid Response: "id" property must be a number or string'
+                    'JSONBird: Invalid Response: "id" property must be a number or string',
                 );
                 assert.strictEqual(
                     protocolErrorEvents[3].message,
-                    'JSONBird: Invalid Response: "id" property must be a number or string'
+                    'JSONBird: Invalid Response: "id" property must be a number or string',
                 );
                 assert.strictEqual(
                     protocolErrorEvents[4].message,
-                    'JSONBird: Invalid Response: The "error" and "result" properties are both present'
+                    'JSONBird: Invalid Response: The "error" and "result" properties are both present',
                 );
                 assert.strictEqual(
                     protocolErrorEvents[5].message,
-                    'JSONBird: Invalid Response: Unknown id'
+                    'JSONBird: Invalid Response: Unknown id',
                 );
             });
         });

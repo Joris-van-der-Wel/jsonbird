@@ -20,7 +20,7 @@ class PromiseFateTracker {
             },
             error => {
                 this.fates.set(name, {promise, reject: error});
-            }
+            },
         );
     }
 

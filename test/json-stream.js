@@ -58,7 +58,7 @@ describe('JSONBird handling string/buffer streams', () => {
                     writeWait.advance();
                     callback();
                 },
-                () => writeEvents.push(END)
+                () => writeEvents.push(END),
             );
         });
 
@@ -76,7 +76,7 @@ describe('JSONBird handling string/buffer streams', () => {
                     '{"jsonrpc": "2.0", "method": "foo",       "params": [100, {"foo": "bar ¢ bar € bar 𐍈 bar"}],"id": 1}' +
                     '{"jsonrpc": "2.0", "method": "foo",      "params": ["Árvíztűrő tükörfúrógép"],"id": 2}' +
                     '{"jsonrpc": "2.0", "method": "foo",      "params": [], "id":3}\n\r\t     ' +
-                    '{"jsonrpc": "2.0", "method": "foo",      "params": [], "id":4}\r\n'
+                    '{"jsonrpc": "2.0", "method": "foo",      "params": [], "id":4}\r\n',
                 );
 
                 return writeWait.wait(5);
@@ -170,7 +170,7 @@ describe('JSONBird handling string/buffer streams', () => {
                     },
                     () => {
                         resolve(writtenString);
-                    }
+                    },
                 );
             });
         });

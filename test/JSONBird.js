@@ -416,7 +416,7 @@ describe('JSONBird', () => {
                     rpc.callLocal('__defineGetter__'),
                     rpc.callLocal('__defineSetter__'),
                     rpc.callLocal('__lookupGetter__'),
-                    rpc.callLocal('__lookupSetter__')
+                    rpc.callLocal('__lookupSetter__'),
                 );
             }
 
@@ -424,9 +424,9 @@ describe('JSONBird', () => {
                 calls.map(
                     promise => promise.then(
                         () => assert(false),
-                        error => error
-                    )
-                )
+                        error => error,
+                    ),
+                ),
             )
             .then(errors => {
                 // eslint-disable-next-line prefer-const

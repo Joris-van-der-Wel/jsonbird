@@ -58,7 +58,7 @@ describe('JSONBird handling pings', () => {
             () => {
                 writeWait.advance();
                 writeEvents.push(FINISH);
-            }
+            },
         );
 
         pingEventWait = new Wait();
@@ -92,7 +92,7 @@ describe('JSONBird handling pings', () => {
 
         return rpc.callLocal('jsonbird.ping').then(
             () => assert(false),
-            error => assert.strictEqual(error.code, -32601) // not found
+            error => assert.strictEqual(error.code, -32601), // not found
         );
     });
 
